@@ -95,13 +95,10 @@ const TablePaginationActionsWrapped = withStyles(actionsStyles, { withTheme: tru
 );
 
 
-function createData(name, calories, fat) {
-    let counter = 0;
-    counter += 1;
-  return { id: counter, name, calories, fat };
-}
-function createTemperatureData(date, time, temperature, drags, comment) {
-    let counter = 0;
+let counter = 0;
+function createTemperatureData(dataObject) {
+  // let counter = 0;
+    let {date, time, temperature, drags, comment} = dataObject;
     counter += 1;
   return { id: counter, date, time, temperature, drags, comment };
 }
@@ -119,26 +116,25 @@ const styles = theme => ({
 });
 
 class DataTable extends React.Component {
+  
+  
+  
+  
   state = {
-    rows: [
-      createData('Cupcake', 305, 3.7),
-      createData('Donut', 452, 25.0),
-      createData('Eclair', 262, 16.0),
-      createData('Frozen yoghurt', 159, 6.0),
-      createData('Gingerbread', 356, 16.0),
-      createData('Honeycomb', 408, 3.2),
-      createData('Ice cream sandwich', 237, 9.0),
-      createData('Jelly Bean', 375, 0.0),
-      createData('KitKat', 518, 26.0),
-      createData('Lollipop', 392, 0.2),
-      createData('Marshmallow', 318, 0),
-      createData('Nougat', 360, 19.0),
-      createData('Oreo', 437, 18.0),
-    ].sort((a, b) => (a.calories < b.calories ? -1 : 1)),
+    rows: [].sort((a, b) => (a.calories < b.calories ? -1 : 1)),
     page: 0,
     rowsPerPage: 5,
   };
-
+  componentDidMount = () => {
+    const tableData=JSON.parse(localStorage.getItem('data'));
+    
+    let tempRows=[];
+    for (const dataItem of tableData.temperature){
+      tempRows.push(createTemperatureData(dataItem));
+    }
+    this.setState({rows: tempRows.sort((a, b) => (a.date < b.date ? -1 : 1))})//, () => {console.log(this.state)})
+   return tempRows
+  }
   handleChangePage = (event, page) => {
     this.setState({ page });
   };
@@ -149,56 +145,47 @@ class DataTable extends React.Component {
 
   render() {
     const { classes } = this.props;
-    
     const { rows, rowsPerPage, page } = this.state;
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
-    //console.log(this.props.dataType)
     let headers = [];
     let headerCells= [];
     if (this.props.dataType==="Temperature"){
         headers =["Дата","Время","Температура","Лекарства","Комментарий"];
-        headerCells = headers.map((h) => <TableCell>{h}</TableCell>);
+        headerCells = headers.map((h,i) => <TableCell key={i}>{h}</TableCell>);
     }
-
-    const tableData=JSON.parse(localStorage.getItem('data'))
-    console.log(localStorage.data.temperature)
-    let tableRows = [
-        createTemperatureData(tableData["temperature"][0]),
-        createData(tableData["temperature"][1]),
-        createData(tableData["temperature"][2]),
-        createData(tableData["temperature"][3]),
-        createData(tableData["temperature"][4]),
-        createData(tableData["temperature"][5]),
-    ]
+    rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => (console.log(row.id)))
     console.log(rows)
-    console.log(tableRows)
     return (
       <Paper className={classes.root}>
-        <div className={classes.tableWrapper}>
+        <div className={classes.tableWrapper} key="troot">
           <Table className={classes.table}>
           <TableHead>
-          <TableRow>
-              {headerCells}
-            {/* <TableCell>Dessert (100g serving)</TableCell>
-            <TableCell>Dessert (100g serving)</TableCell>
-            <TableCell align="right">Calories</TableCell>
-            <TableCell align="right">Fat (g)</TableCell>
-            <TableCell align="right">Carbs (g)</TableCell>
-            <TableCell align="right">Protein (g)</TableCell> */}
+          <TableRow key="0">
+            {headerCells}
           </TableRow>
         </TableHead>
             <TableBody>
               {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => (
                 <TableRow key={row.id}>
-                  <TableCell component="th" scope="row">
-                    {row.name}
+                  <TableCell component="td" scope="row">
+                    {row.date}
                   </TableCell>
-                  <TableCell align="right">{row.calories}</TableCell>
-                  <TableCell align="right">{row.fat}</TableCell>
+                  <TableCell component="td" scope="row">
+                    {row.time}
+                  </TableCell>
+                  <TableCell component="td" scope="row">
+                    {row.temperature}
+                  </TableCell>
+                  <TableCell component="td" scope="row">
+                    {row.drags}
+                  </TableCell>
+                  <TableCell component="td" scope="row">
+                    {row.comment}
+                  </TableCell>
                 </TableRow>
               ))}
               {emptyRows > 0 && (
-                <TableRow style={{ height: 48 * emptyRows }}>
+                <TableRow style={{ height: 48 * emptyRows }}key="empty">
                   <TableCell colSpan={6} />
                 </TableRow>
               )}
