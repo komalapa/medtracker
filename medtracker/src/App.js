@@ -15,7 +15,7 @@ function App() {
   return (
     <div className="App">
       
-        <AddItemForm dataType="Temperature"/>
+        <AddItemForm dataType="Temperature" prevTemperature={37.8}/>
         <DataTable dataType="Temperature"/>
 
     </div>

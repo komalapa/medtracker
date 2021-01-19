@@ -24,7 +24,7 @@ import TemperatureFields from './temperatureFields/temperatureFields'
 //     width: 200,
 //   },
 // }));
-function DateAndTimePickers() {
+function DateAndTimePickers(props) {
   //const classes = useStyles();
   const currentDate = new Date();
   const currentLocalDate = new Date(currentDate - (currentDate.getTimezoneOffset() * 60000)).toISOString().slice(0, -8);
@@ -41,6 +41,7 @@ function DateAndTimePickers() {
         InputLabelProps={{
           shrink: true,
         }}
+        onChange={props.setDate}
       />
     
   );
@@ -51,8 +52,11 @@ function DateAndTimePickers() {
 export default class AddItemForm extends React.Component {
   state = {
     open: false,
-    //prevTemperature: 36.6,
-    //curTemperature: 36.6,
+    prevTemperature: this.props.prevTemperature,
+    curTemperature: this.props.prevTemperature,
+    drugs:'',
+    comment:'',
+    date: new Date(),
   };
 
   handleClickOpen = () => {
@@ -63,15 +67,29 @@ export default class AddItemForm extends React.Component {
   handleClose = () => {
     this.setState({ open: false });
   };
+  handleDone = () =>{
+    let row = {"date":this.state.date.toLocaleDateString(),"time":this.state.date.toLocaleTimeString().slice(0,5),"temperature": this.state.curTemperature, "drags":this.state.drugs, "comment":this.state.comment};
+    let lsData = localStorage.getItem('data');
+    lsData = lsData ? JSON.parse(lsData) : [];
+    lsData.temperature.push(row);
+    localStorage.setItem("data", JSON.stringify(lsData));
+    this.setState({ open: false });
+  }
   handleCurTemperature = (evt, newValue) => {
     this.setState({ curTemperature: Number(newValue) });
-    // console.log(evt.target.ariaValueNow)
-    console.log(newValue)
   };
   handleCurTemperatureText = (evt) => {
     this.setState({ curTemperature: evt.target.value });
-    // console.log(evt.target.ariaValueNow)
-    console.log(evt.target.value)
+  };
+  handleDrugs = (evt) => {
+    this.setState({ drugs: evt.target.value });
+  };
+  handleComment = (evt) => {
+    this.setState({ comment: evt.target.value });
+  };
+  handleDate = (evt) => {
+    this.setState({ date: new Date(evt.target.value)});
+    console.log(new Date(evt.target.value))
   };
   valuetext = (value) => {
     return `${value}°C`;
@@ -90,8 +108,8 @@ export default class AddItemForm extends React.Component {
         >
           <DialogTitle id="form-dialog-title">Новая запись</DialogTitle>
           <DialogContent>
-            <DateAndTimePickers></DateAndTimePickers>
-            <TemperatureFields prevTemperature={38.6}/>
+            <DateAndTimePickers setDate={this.handleDate}></DateAndTimePickers>
+            <TemperatureFields prevTemperature={this.state.prevTemperature} setTemperature={this.handleCurTemperature}/>
             <TextField
               id="drugs"
               label="Лекарства"
@@ -99,6 +117,7 @@ export default class AddItemForm extends React.Component {
               rows={4}
               defaultValue=""
               fullWidth
+              onChange={this.handleDrugs}
             />
             <TextField
               id="comment"
@@ -107,13 +126,14 @@ export default class AddItemForm extends React.Component {
               rows={4}
               defaultValue=""
               fullWidth
+              onChange={this.handleComment}
             />
           </DialogContent>
           <DialogActions>
             <Button onClick={this.handleClose} color="primary">
               Отмена
             </Button>
-            <Button onClick={this.handleClose} color="primary">
+            <Button onClick={this.handleDone} color="primary">
               Записать
             </Button>
           </DialogActions>
@@ -124,4 +144,5 @@ export default class AddItemForm extends React.Component {
 }
 AddItemForm.propTypes = {
   dataType: PropTypes.string.isRequired,//то же значение, что у таблицы
+  prevTemperature: PropTypes.number,//температура из последней строки
 };

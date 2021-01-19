@@ -45,10 +45,12 @@ export default class TemperatureFields extends React.Component {
 
   handleCurTemperature = (evt, newValue) => {
     this.setState({ curTemperature: Number(newValue) });
+    this.props.setTemperature(evt,newValue)
     //console.log(newValue)
   };
   handleCurTemperatureText = (evt) => {
     this.setState({ curTemperature: evt.target.value });
+    this.props.setTemperature(evt,evt.target.value)
     //console.log(evt.target.value)
   };
   valuetext = (value) =>{
@@ -96,4 +98,5 @@ export default class TemperatureFields extends React.Component {
 }
 TemperatureFields.propTypes = {
   prevTemperature: PropTypes.number.isRequired,//Последнее значение из таблицы
+  setTemperature: PropTypes.func.isRequired,//для передачи значения родителю
 };
