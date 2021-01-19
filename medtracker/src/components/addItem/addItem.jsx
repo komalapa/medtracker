@@ -68,7 +68,7 @@ export default class AddItemForm extends React.Component {
     this.setState({ open: false });
   };
   handleDone = () =>{
-    let row = {"date":this.state.date.toLocaleDateString(),"time":this.state.date.toLocaleTimeString().slice(0,5),"temperature": this.state.curTemperature, "drags":this.state.drugs, "comment":this.state.comment};
+    let row = {"date":this.state.date.toLocaleDateString(),"time":this.state.date.toLocaleTimeString().slice(0,5),"temperature": this.state.curTemperature, "drugs":this.state.drugs, "comment":this.state.comment};
     let lsData = localStorage.getItem('data');
     lsData = lsData ? JSON.parse(lsData) : [];
     lsData.temperature.push(row);

@@ -98,9 +98,9 @@ const TablePaginationActionsWrapped = withStyles(actionsStyles, { withTheme: tru
 let counter = 0;
 function createTemperatureData(dataObject) {
   // let counter = 0;
-    let {date, time, temperature, drags, comment} = dataObject;
+    let {date, time, temperature, drugs, comment} = dataObject;
     counter += 1;
-  return { id: counter, date, time, temperature, drags, comment };
+  return { id: counter, date, time, temperature, drugs, comment };
 }
 const styles = theme => ({
   root: {
