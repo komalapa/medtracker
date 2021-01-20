@@ -14,6 +14,7 @@ import FirstPageIcon from '@material-ui/icons/FirstPage';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
+import AddItemForm from "../../components/addItem/addItem"
 
 const actionsStyles = theme => ({
   root: {
@@ -48,6 +49,7 @@ class TablePaginationActions extends React.Component {
 
     return (
       <div className={classes.root}>
+        
         <IconButton
           onClick={this.handleFirstPageButtonClick}
           disabled={page === 0}
@@ -117,24 +119,33 @@ const styles = theme => ({
 
 class DataTable extends React.Component {
   
-  
-  
-  
   state = {
     rows: [].sort((a, b) => (a.calories < b.calories ? -1 : 1)),
     page: 0,
     rowsPerPage: 5,
+    dataTable: {},
   };
   componentDidMount = () => {
-    const tableData=JSON.parse(localStorage.getItem('data'));
-    
+    //const tableData=this.props.data;
+    //console.log(tableData)
+    let lsDataStr=localStorage.getItem("data");
+    console.log("$$$$$$$$$ 1 ", lsDataStr);
+    let lsData = (JSON.parse(lsDataStr).temperature);
+    console.log("$$$$$$$$$ 2 ", lsData);
+    this.setState((state, props) => {
+      state.DataTable = lsData
+      console.log("STATE"+state)
+    });
+    //this.setState({dataTable: lsData},console.log(this.state.dataTable) )
+    console.log("$$$$$$$$$ ",this.state.dataTable);
     let tempRows=[];
-    for (const dataItem of tableData.temperature){
+    for (const dataItem of lsData){
       tempRows.push(createTemperatureData(dataItem));
     }
     this.setState({rows: tempRows.sort((a, b) => (a.date < b.date ? -1 : 1))})//, () => {console.log(this.state)})
    return tempRows
   }
+
   handleChangePage = (event, page) => {
     this.setState({ page });
   };
@@ -142,7 +153,14 @@ class DataTable extends React.Component {
   handleChangeRowsPerPage = event => {
     this.setState({ page: 0, rowsPerPage: event.target.value });
   };
-
+  
+  handleAddItem = (row) => {
+    // setDataTable.temperature([...dataTable,row])
+    //console.log("row: ", row);
+    this.setState(prevState => {console.log(prevState);  prevState.temperature.push(row); return prevState})
+    localStorage.setItem("data",JSON.stringify(this.state.dataTable))
+    //console.log("state: ", dataTable);
+  }
   render() {
     const { classes } = this.props;
     const { rows, rowsPerPage, page } = this.state;
@@ -153,9 +171,11 @@ class DataTable extends React.Component {
         headers =["Дата","Время","Температура","Лекарства","Комментарий"];
         headerCells = headers.map((h,i) => <TableCell key={i}>{h}</TableCell>);
     }
-    rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => (console.log(row.id)))
-    console.log(rows)
+    //rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => (console.log(row.id)))
+    //console.log(rows)
     return (
+      <>
+      <AddItemForm dataType="Temperature" prevTemperature={37.8} writeData={this.props.writeData}/>
       <Paper className={classes.root}>
         <div className={classes.tableWrapper} key="troot">
           <Table className={classes.table}>
@@ -210,6 +230,7 @@ class DataTable extends React.Component {
           </Table>
         </div>
       </Paper>
+    </>
     );
   }
 }
@@ -218,6 +239,7 @@ DataTable.propTypes = {
   classes: PropTypes.object.isRequired,
   dataType: PropTypes.string.isRequired, //Строковые названия показателей
   data: PropTypes.object,//Сама таблица
+  tableData:  PropTypes.object.isRequired,
 };
 
 export default withStyles(styles)(DataTable);
