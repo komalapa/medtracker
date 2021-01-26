@@ -11,31 +11,15 @@ import PropTypes from 'prop-types';
 
 import TemperatureFields from './temperatureFields/temperatureFields'
 
-// const useStyles = makeStyles((theme) => ({
-//   container: {
-//     display: 'flex',
-//     justifyContent:'space-around',
-//     flexWrap: 'wrap',
-//     padding:'20px',
-//   },
-//   textField: {
-//     marginLeft: theme.spacing(1),
-//     marginRight: theme.spacing(1),
-//     width: 200,
-//   },
-// }));
 function DateAndTimePickers(props) {
-  //const classes = useStyles();
   const currentDate = new Date();
   const currentLocalDate = new Date(currentDate - (currentDate.getTimezoneOffset() * 60000)).toISOString().slice(0, -8);
-  // console.log(currentLocalDate);
-
+  
   return (
       <TextField
         id="datetime-local"
         label="Дата и время"
         type="datetime-local"
-        //defaultValue="2017-05-24T10:30"
         defaultValue={currentLocalDate}
         fullWidth
         InputLabelProps={{
@@ -69,11 +53,14 @@ export default class AddItemForm extends React.Component {
   };
   handleDone = () =>{
     let row = {"date":this.state.date.toLocaleDateString(),"time":this.state.date.toLocaleTimeString().slice(0,5),"temperature": this.state.curTemperature, "drugs":this.state.drugs, "comment":this.state.comment};
+    // УБРАТЬ запись напрямую в LS
     // let lsData = localStorage.getItem('data');
     // lsData = lsData ? JSON.parse(lsData) : [];
     // lsData.temperature.push(row);
     // localStorage.setItem("data", JSON.stringify(lsData));
+    console.log ("handleDone")
     this.props.writeData(row);
+    
     this.setState({ open: false });
   }
   handleCurTemperature = (evt, newValue) => {

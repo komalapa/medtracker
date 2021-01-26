@@ -49,7 +49,7 @@ class TablePaginationActions extends React.Component {
 
     return (
       <div className={classes.root}>
-        
+
         <IconButton
           onClick={this.handleFirstPageButtonClick}
           disabled={page === 0}
@@ -96,12 +96,12 @@ const TablePaginationActionsWrapped = withStyles(actionsStyles, { withTheme: tru
   TablePaginationActions,
 );
 
-
+//подготовка данных для таблицы. Унифицировать бы.
 let counter = 0;
 function createTemperatureData(dataObject) {
   // let counter = 0;
-    let {date, time, temperature, drugs, comment} = dataObject;
-    counter += 1;
+  let { date, time, temperature, drugs, comment } = dataObject;
+  counter += 1;
   return { id: counter, date, time, temperature, drugs, comment };
 }
 const styles = theme => ({
@@ -118,32 +118,44 @@ const styles = theme => ({
 });
 
 class DataTable extends React.Component {
-  
-  state = {
+  constructor (props){
+    super(props)
+    this.state = {
     rows: [].sort((a, b) => (a.calories < b.calories ? -1 : 1)),
     page: 0,
     rowsPerPage: 5,
     dataTable: {},
   };
+}
   componentDidMount = () => {
-    //const tableData=this.props.data;
-    //console.log(tableData)
-    let lsDataStr=localStorage.getItem("data");
-    console.log("$$$$$$$$$ 1 ", lsDataStr);
+    let lsDataStr = localStorage.getItem("data");
+    //console.log("$$$$$$$$$ 1 ", lsDataStr);
     let lsData = (JSON.parse(lsDataStr).temperature);
-    console.log("$$$$$$$$$ 2 ", lsData);
-    this.setState((state, props) => {
-      state.DataTable = lsData
-      console.log("STATE"+state)
-    });
-    //this.setState({dataTable: lsData},console.log(this.state.dataTable) )
-    console.log("$$$$$$$$$ ",this.state.dataTable);
-    let tempRows=[];
-    for (const dataItem of lsData){
-      tempRows.push(createTemperatureData(dataItem));
-    }
-    this.setState({rows: tempRows.sort((a, b) => (a.date < b.date ? -1 : 1))})//, () => {console.log(this.state)})
-   return tempRows
+    //console.log("$$$$$$$$$ 2 ", lsData);
+    
+    // this.setState((state, props) => {
+    //   state.dataTable = lsData;
+    //   state.MyObj = {'hello':'kitty'};
+    //   return state
+    // });
+    this.setState({dataTable: lsData},()=>{
+      let tempRows = [];
+      for (const dataItem of this.state.dataTable) {
+        tempRows.push(createTemperatureData(dataItem));
+      }
+      this.setState({ rows: tempRows.sort((a, b) => (a.time > b.time ? -1 : 1)) })
+    })
+    console.log("STATE" )
+    console.log( this.state);
+    //ПРОБЛЕМА почему-то не видит значение
+    console.log("???????????? rowsPerPage ", this.state.rowsPerPage);
+    console.log("???????????? dataTable", this.state.dataTable);
+    // let tempRows = [];
+    // for (const dataItem of lsData) {
+    //   tempRows.push(createTemperatureData(dataItem));
+    // }
+    // this.setState({ rows: tempRows.sort((a, b) => (a.date < b.date ? -1 : 1)) })//, () => {console.log(this.state)})
+    //return tempRows
   }
 
   handleChangePage = (event, page) => {
@@ -153,84 +165,91 @@ class DataTable extends React.Component {
   handleChangeRowsPerPage = event => {
     this.setState({ page: 0, rowsPerPage: event.target.value });
   };
-  
+
   handleAddItem = (row) => {
+    console.log ("this", this.state.dataTable)
     // setDataTable.temperature([...dataTable,row])
     //console.log("row: ", row);
-    this.setState(prevState => {console.log(prevState);  prevState.temperature.push(row); return prevState})
-    localStorage.setItem("data",JSON.stringify(this.state.dataTable))
-    //console.log("state: ", dataTable);
+    this.setState({dataTable: [...this.state.dataTable, row]},()=>{
+      let tempRows = [];
+      for (const dataItem of this.state.dataTable) {
+        tempRows.push(createTemperatureData(dataItem));
+      }
+      this.setState({ rows: tempRows.sort((a, b) => (a.time > b.time ? -1 : 1)) })
+    })
+    localStorage.setItem("data", JSON.stringify(this.state.dataTable))
+    console.log("done")
+    console.log("state: ", this.state);
   }
   render() {
     const { classes } = this.props;
     const { rows, rowsPerPage, page } = this.state;
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
     let headers = [];
-    let headerCells= [];
-    if (this.props.dataType==="Temperature"){
-        headers =["Дата","Время","Температура","Лекарства","Комментарий"];
-        headerCells = headers.map((h,i) => <TableCell key={i}>{h}</TableCell>);
+    let headerCells = [];
+    if (this.props.dataType === "Temperature") {
+      headers = ["Дата", "Время", "Температура", "Лекарства", "Комментарий"];
+      headerCells = headers.map((h, i) => <TableCell key={i}>{h}</TableCell>);
     }
-    //rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => (console.log(row.id)))
-    //console.log(rows)
+    //const onAddItem=this.handleAddItem.bind(this)
     return (
       <>
-      <AddItemForm dataType="Temperature" prevTemperature={37.8} writeData={this.props.writeData}/>
-      <Paper className={classes.root}>
-        <div className={classes.tableWrapper} key="troot">
-          <Table className={classes.table}>
-          <TableHead>
-          <TableRow key="0">
-            {headerCells}
-          </TableRow>
-        </TableHead>
-            <TableBody>
-              {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => (
-                <TableRow key={row.id}>
-                  <TableCell component="td" scope="row">
-                    {row.date}
-                  </TableCell>
-                  <TableCell component="td" scope="row">
-                    {row.time}
-                  </TableCell>
-                  <TableCell component="td" scope="row">
-                    {row.temperature}
-                  </TableCell>
-                  <TableCell component="td" scope="row">
-                    {row.drags}
-                  </TableCell>
-                  <TableCell component="td" scope="row">
-                    {row.comment}
-                  </TableCell>
+        <AddItemForm dataType="Temperature" prevTemperature={37.8} writeData={this.handleAddItem} />
+        <Paper className={classes.root}>
+          <div className={classes.tableWrapper} key="troot">
+            <Table className={classes.table}>
+              <TableHead>
+                <TableRow key="0">
+                  {headerCells}
                 </TableRow>
-              ))}
-              {emptyRows > 0 && (
-                <TableRow style={{ height: 48 * emptyRows }}key="empty">
-                  <TableCell colSpan={6} />
+              </TableHead>
+              <TableBody>
+                {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => (
+                  <TableRow key={row.id}>
+                    <TableCell component="td" scope="row">
+                      {row.date}
+                    </TableCell>
+                    <TableCell component="td" scope="row">
+                      {row.time}
+                    </TableCell>
+                    <TableCell component="td" scope="row">
+                      {row.temperature}
+                    </TableCell>
+                    <TableCell component="td" scope="row">
+                      {row.drags}
+                    </TableCell>
+                    <TableCell component="td" scope="row">
+                      {row.comment}
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {emptyRows > 0 && (
+                  <TableRow style={{ height: 48 * emptyRows }} key="empty">
+                    <TableCell colSpan={6} />
+                  </TableRow>
+                )}
+              </TableBody>
+              <TableFooter>
+                <TableRow>
+                  <TablePagination
+                    rowsPerPageOptions={[5, 10, 25]}
+                    colSpan={3}
+                    count={rows.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    SelectProps={{
+                      native: true,
+                    }}
+                    onChangePage={this.handleChangePage}
+                    onChangeRowsPerPage={this.handleChangeRowsPerPage}
+                    ActionsComponent={TablePaginationActionsWrapped}
+                  />
                 </TableRow>
-              )}
-            </TableBody>
-            <TableFooter>
-              <TableRow>
-                <TablePagination
-                  rowsPerPageOptions={[5, 10, 25]}
-                  colSpan={3}
-                  count={rows.length}
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  SelectProps={{
-                    native: true,
-                  }}
-                  onChangePage={this.handleChangePage}
-                  onChangeRowsPerPage={this.handleChangeRowsPerPage}
-                  ActionsComponent={TablePaginationActionsWrapped}
-                />
-              </TableRow>
-            </TableFooter>
-          </Table>
-        </div>
-      </Paper>
-    </>
+              </TableFooter>
+            </Table>
+          </div>
+        </Paper>
+      </>
     );
   }
 }
@@ -239,7 +258,7 @@ DataTable.propTypes = {
   classes: PropTypes.object.isRequired,
   dataType: PropTypes.string.isRequired, //Строковые названия показателей
   data: PropTypes.object,//Сама таблица
-  tableData:  PropTypes.object.isRequired,
+  tableData: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles)(DataTable);
