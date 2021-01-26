@@ -149,15 +149,7 @@ class DataTable extends React.Component {
 }
   componentDidMount = () => {
     let lsDataStr = localStorage.getItem("data");
-    //console.log("$$$$$$$$$ 1 ", lsDataStr);
     let lsData = (JSON.parse(lsDataStr).temperature);
-    //console.log("$$$$$$$$$ 2 ", lsData);
-    
-    // this.setState((state, props) => {
-    //   state.dataTable = lsData;
-    //   state.MyObj = {'hello':'kitty'};
-    //   return state
-    // });
     this.setState({dataTable: lsData},()=>{
       let tempRows = [];
       for (const dataItem of this.state.dataTable) {
@@ -165,10 +157,6 @@ class DataTable extends React.Component {
       }
       this.setState({ rows: tempRows.sort((a, b) => (a.time > b.time ? -1 : 1)) })
     })
-    // console.log("STATE" )
-    // console.log( this.state);
-    // console.log("???????????? rowsPerPage ", this.state.rowsPerPage);
-    // console.log("???????????? dataTable", this.state.dataTable);
   }
 
   handleChangePage = (event, page) => {
@@ -180,17 +168,18 @@ class DataTable extends React.Component {
   };
 
   handleAddItem = (row) => {
-    console.log ("this", this.state.dataTable)
-    // setDataTable.temperature([...dataTable,row])
-    //console.log("row: ", row);
     this.setState({dataTable: [...this.state.dataTable, row]},()=>{
+      let lsData=JSON.parse(localStorage.getItem("data"));
+      lsData.temperature=this.state.dataTable;
+      localStorage.setItem("data", JSON.stringify(lsData));
       let tempRows = [];
       for (const dataItem of this.state.dataTable) {
         tempRows.push(createTemperatureData(dataItem));
       }
       this.setState({ rows: tempRows.sort((a, b) => (a.time > b.time ? -1 : 1)) })
     })
-    localStorage.setItem("data", JSON.stringify(this.state.dataTable))
+    
+    
     console.log("done")
     console.log("state: ", this.state);
   }
@@ -273,8 +262,8 @@ class DataTable extends React.Component {
 DataTable.propTypes = {
   classes: PropTypes.object.isRequired,
   dataType: PropTypes.string.isRequired, //Строковые названия показателей
-  data: PropTypes.object,//Сама таблица
-  tableData: PropTypes.object.isRequired,
+  //data: PropTypes.object,//Сама таблица
+  //tableData: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles)(DataTable);
