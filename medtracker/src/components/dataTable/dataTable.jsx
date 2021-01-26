@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableHead from '@material-ui/core/TableHead';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableFooter from '@material-ui/core/TableFooter';
-import TablePagination from '@material-ui/core/TablePagination';
-import TableRow from '@material-ui/core/TableRow';
+//import Table from '@material-ui/core/Table';
+//import TableHead from '@material-ui/core/TableHead';
+//import TableBody from '@material-ui/core/TableBody';
+//import TableCell from '@material-ui/core/TableCell';
+//import TableFooter from '@material-ui/core/TableFooter';
+//import TablePagination from '@material-ui/core/TablePagination';
+//import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import IconButton from '@material-ui/core/IconButton';
 import FirstPageIcon from '@material-ui/icons/FirstPage';
@@ -15,14 +15,34 @@ import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
 import AddItemForm from "../../components/addItem/addItem"
+//Грид для теста
+import { DataGrid } from '@material-ui/data-grid';
 
-const actionsStyles = theme => ({
-  root: {
-    flexShrink: 0,
-    color: theme.palette.text.secondary,
-    marginLeft: theme.spacing.unit * 2.5,
-  },
-});
+const columns = [
+  { field: 'date', headerName: 'Дата', width: 150 },
+  { field: 'time', headerName: 'Время', width: 100 },
+  { field: 'temperature', headerName: 'Температура', width: 100 },
+  { field: 'drugs', headerName: 'Лекарства', width: 250 },
+  { field: 'comment', headerName: 'Комментарий', width: 250 },
+  
+];
+
+
+function DataTableGrid(props) {
+  return (
+    <div style={{ height: 400, width: '100%' }}>
+      <DataGrid rows={props.rows} columns={columns} pageSize={5} />
+    </div>
+  );
+}
+//Конец грида для теста
+// const actionsStyles = theme => ({
+//   root: {
+//     flexShrink: 0,
+//     color: theme.palette.text.secondary,
+//     marginLeft: theme.spacing.unit * 2.5,
+//   },
+// });
 
 class TablePaginationActions extends React.Component {
   handleFirstPageButtonClick = event => {
@@ -92,9 +112,9 @@ TablePaginationActions.propTypes = {
   theme: PropTypes.object.isRequired,
 };
 
-const TablePaginationActionsWrapped = withStyles(actionsStyles, { withTheme: true })(
-  TablePaginationActions,
-);
+//const TablePaginationActionsWrapped = withStyles(actionsStyles, { withTheme: true })(
+//  TablePaginationActions,
+//);
 
 //подготовка данных для таблицы. Унифицировать бы.
 let counter = 0;
@@ -145,17 +165,10 @@ class DataTable extends React.Component {
       }
       this.setState({ rows: tempRows.sort((a, b) => (a.time > b.time ? -1 : 1)) })
     })
-    console.log("STATE" )
-    console.log( this.state);
-    //ПРОБЛЕМА почему-то не видит значение
-    console.log("???????????? rowsPerPage ", this.state.rowsPerPage);
-    console.log("???????????? dataTable", this.state.dataTable);
-    // let tempRows = [];
-    // for (const dataItem of lsData) {
-    //   tempRows.push(createTemperatureData(dataItem));
-    // }
-    // this.setState({ rows: tempRows.sort((a, b) => (a.date < b.date ? -1 : 1)) })//, () => {console.log(this.state)})
-    //return tempRows
+    // console.log("STATE" )
+    // console.log( this.state);
+    // console.log("???????????? rowsPerPage ", this.state.rowsPerPage);
+    // console.log("???????????? dataTable", this.state.dataTable);
   }
 
   handleChangePage = (event, page) => {
@@ -183,20 +196,20 @@ class DataTable extends React.Component {
   }
   render() {
     const { classes } = this.props;
-    const { rows, rowsPerPage, page } = this.state;
-    const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
-    let headers = [];
-    let headerCells = [];
+//    const { rows, rowsPerPage, page } = this.state;
+//    const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+//    let headers = [];
+//    let headerCells = [];
     if (this.props.dataType === "Temperature") {
-      headers = ["Дата", "Время", "Температура", "Лекарства", "Комментарий"];
-      headerCells = headers.map((h, i) => <TableCell key={i}>{h}</TableCell>);
+//      headers = ["Дата", "Время", "Температура", "Лекарства", "Комментарий"];
+//      headerCells = headers.map((h, i) => <TableCell key={i}>{h}</TableCell>);
     }
     //const onAddItem=this.handleAddItem.bind(this)
     return (
       <>
         <AddItemForm dataType="Temperature" prevTemperature={37.8} writeData={this.handleAddItem} />
         <Paper className={classes.root}>
-          <div className={classes.tableWrapper} key="troot">
+          {/* <div className={classes.tableWrapper} key="troot">
             <Table className={classes.table}>
               <TableHead>
                 <TableRow key="0">
@@ -247,7 +260,10 @@ class DataTable extends React.Component {
                 </TableRow>
               </TableFooter>
             </Table>
-          </div>
+          </div> */}
+
+          <DataTableGrid rows={this.state.rows}/>
+
         </Paper>
       </>
     );
