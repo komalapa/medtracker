@@ -27,7 +27,7 @@ const columns = [
   { field: 'drugs', headerName: 'Лекарства', width: 250 ,
  
   renderCell: (params) =>  {console.log (params.row.drugs); return(
-    <Tooltip title={params.row.comment} >
+    <Tooltip title={params.row.drugs} >
      <span className="table-cell-trucate">{params.row.drugs}</span>
      </Tooltip>
    )},  
