@@ -17,13 +17,27 @@ import LastPageIcon from '@material-ui/icons/LastPage';
 import AddItemForm from "../../components/addItem/addItem"
 //Грид для теста
 import { DataGrid } from '@material-ui/data-grid';
+import Tooltip from '@material-ui/core/Tooltip';
+import './dataTable.css';
 
 const columns = [
   { field: 'date', headerName: 'Дата', width: 150 },
   { field: 'time', headerName: 'Время', width: 100 },
   { field: 'temperature', headerName: 'Температура', width: 100 },
-  { field: 'drugs', headerName: 'Лекарства', width: 250 },
-  { field: 'comment', headerName: 'Комментарий', width: 250 },
+  { field: 'drugs', headerName: 'Лекарства', width: 250 ,
+ 
+  renderCell: (params) =>  {console.log (params.row.drugs); return(
+    <Tooltip title={params.row.comment} >
+     <span className="table-cell-trucate">{params.row.drugs}</span>
+     </Tooltip>
+   )},  
+},
+  { field: 'comment', headerName: 'Комментарий', width: 250,  
+  renderCell: (params) =>  {console.log (params.row.comment); return(
+    <Tooltip title={params.row.comment} >
+     <span className="table-cell-trucate">{params.row.comment}</span>
+     </Tooltip>
+   )},}
   
 ];
 
